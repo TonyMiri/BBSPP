@@ -1,12 +1,5 @@
 import random
 
-suits = ['D', 'S', 'H', 'C']
-cards = ['1','2','3','4','5','6','7','8','9','10','J','Q','K','A']
-all_cards = []
-for x in suits:
-    for y in cards:
-        all_cards.append([y, x])
-
 def draw_card(deck) -> list:
     return random.choice(deck)
 
@@ -67,6 +60,13 @@ def print_cards(cards, multi=False):
 #     move = input()
 
 if __name__ == '__main__':
+    suits = ['D', 'S', 'H', 'C']
+    cards = ['1','2','3','4','5','6','7','8','9','10','J','Q','K','A']
+    all_cards = []
+    print(type(all_cards))
+    for x in suits:
+        for y in cards:
+            all_cards.append([y, x])
 
     while True:
         user_score = 0
@@ -74,15 +74,17 @@ if __name__ == '__main__':
 
         bet_size = input("How much would you like to bet?\n>")
 
+        player_hand = []
         player_ascii_hand = []
         p1 = draw_card(all_cards)
-        all_cards = all_cards.remove(p1)
-        player_hand = player_hand.append(draw_card())
+        all_cards.remove(p1)
+        player_hand.append(p1)
 
-
+        dealer_hand = []
         dealer_ascii_hand = []
-        dealer_hand = draw_card()
-        dealer_hand = dealer_hand.append(draw_card())
+        d1 = draw_card(all_cards)
+        dealer_hand.append(d1)
+        all_cards.remove(d1)
         first_draw = True
 
         for x in player_hand:
@@ -91,7 +93,8 @@ if __name__ == '__main__':
         for x in dealer_hand:
             if first_draw:
                 dealer_ascii_hand.append(create_card('hide', x))
-                dealer_ascii_hand.append(create_card('show', x))
+                first_draw = False
+            dealer_ascii_hand.append(create_card('show', x))
 
         print_cards(dealer_ascii_hand, multi=True)
         print("_________", 'Dealer Hand', '', sep='\n')
