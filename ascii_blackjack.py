@@ -7,12 +7,8 @@ for x in suits:
     for y in cards:
         all_cards.append([y, x])
 
-def draw_card() -> list:
-    global all_cards
-
-    card = random.choice(all_cards)
-    all_cards = all_cards.remove(card)
-    return card
+def draw_card(deck) -> list:
+    return random.choice(deck)
 
 def calculate_score(user_cards: list) -> int:
     score = 0
@@ -79,7 +75,8 @@ if __name__ == '__main__':
         bet_size = input("How much would you like to bet?\n>")
 
         player_ascii_hand = []
-        player_hand = draw_card()
+        p1 = draw_card(all_cards)
+        all_cards = all_cards.remove(p1)
         player_hand = player_hand.append(draw_card())
 
 
