@@ -1,6 +1,6 @@
 import random
 
-def draw_card(deck) -> list:
+def draw_card(deck, who, hand, ascii_hand) -> list:
     return random.choice(deck)
 
 def calculate_score(user_cards: list) -> int:
@@ -56,6 +56,8 @@ def print_cards(cards, multi=False):
         print(cards_string)
 
 
+
+
 # def get_player_move():
 #     move = input()
 
@@ -63,16 +65,19 @@ if __name__ == '__main__':
     suits = ['D', 'S', 'H', 'C']
     cards = ['1','2','3','4','5','6','7','8','9','10','J','Q','K','A']
     all_cards = []
-    print(type(all_cards))
+
     for x in suits:
         for y in cards:
             all_cards.append([y, x])
+    
+    user_score = 0
+    user_credits = 10000
 
-    while True:
-        user_score = 0
-        user_credits = 10000
-
+    while user_credits > 0:
+    
+        print(f"Your balance is {user_credits} credits.")
         bet_size = input("How much would you like to bet?\n>")
+        user_credits -= int(bet_size)
 
         player_hand = []
         player_ascii_hand = []
@@ -94,9 +99,12 @@ if __name__ == '__main__':
             if first_draw:
                 dealer_ascii_hand.append(create_card('hide', x))
                 first_draw = False
+                break
             dealer_ascii_hand.append(create_card('show', x))
 
         print_cards(dealer_ascii_hand, multi=True)
         print("_________", 'Dealer Hand', '', sep='\n')
         print_cards(player_ascii_hand, multi=True)
         print("_________", 'Your Hand', '', sep='\n')
+        print(f'Current Bet: {bet_size}')
+        print(f'Remanining Balance: {user_credits}')
