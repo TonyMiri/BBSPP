@@ -241,5 +241,3 @@ if __name__ == '__main__':
 
     print("You're outta money, ya bum! Get outta here!")   
 
-#TODO:
-#Refactor print_cards() function?
