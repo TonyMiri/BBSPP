@@ -1,5 +1,6 @@
 import calendar
 import math
+import datetime
 
 user_input_date = input("Enter a month and year in the following format: mm/yyyy\n>")
 
@@ -9,13 +10,20 @@ my_month = int(date_values[0])
 my_year = int(date_values[1])
 
 #Get the calendar for the given month and month before
-last_nums = calendar.month(my_year, my_month-1)
+input_date = datetime.datetime.strptime(f'{my_year}/{my_month}', "%Y/%m")
+prev_month = input_date.month % 12 - 1
+prev_year = my_year
+if prev_month == 0:
+    prev_month = 12
+    prev_year -= 1
+
+last_nums = calendar.month(prev_year, prev_month)
 my_nums = calendar.month(my_year,my_month)
-next_nums = calendar.month(my_year, my_month + 1)
 
 #Split the calendar by "rows"
-last_last_nums = last_nums.split("\n")[-2].split(" ")
+last_nums = last_nums.split("\n")
 my_nums_split = my_nums.split("\n")
+last_last_nums = " ".join(last_nums[-3:-1]).split(" ")
 
 #Make each row into a separate list
 arr1 = [i.split(" ") for i in my_nums_split]
@@ -29,30 +37,35 @@ for x, y in enumerate(arr1):
         #Shift the last element of the list to the next list
         arr1[x+1].insert(0, arr1[x].pop())
 
-arr1[-1] += []
-
 #Move 'Su' to the front
 arr1[1].insert(0, arr1[1].pop())
 
-#Add values to last list for the upcoming month
-x = 1
+def fill_week(week):
+    counter = 1
+    while len(week) < 7:
+        week.append(counter)
+        counter += 1
+
+#Fill last and second-to-last calendar week in the month
+if len(arr1[-2]) < 7:
+    arr1[-2] += arr1[-1]
+    fill_week(arr1[-2])
+
 if len(arr1[-1]) < 7:
-    nums_to_fill = 7 - len(arr1[-1])
-    for x in range(1, nums_to_fill+1):
-        arr1[-1].append(str(x))
+    fill_week(arr1[-1])
 
 #Populate the first week dates with missing dates from previous month
 if len(arr1[2]) < 7:
-    boop = -1* (7 - len(arr1[2]))
-    arr1[2].insert(0, last_last_nums[boop:])
-    arr1[2][0] = arr1[2][0][0]
+    missing_days = 1 * (7 - len(arr1[2]))
+    for x in range(missing_days):
+        arr1[2].insert(0, last_last_nums[(x+1)*-1])
 
 #Create the top line of the calendar border
 cal_top = ""
 x = 0
-while x <= 84:
+while x <= 77:
     char = "-"
-    if x % 12 == 0:
+    if x % 11 == 0:
         char = "+"
     cal_top += char
     x += 1
@@ -60,8 +73,7 @@ while x <= 84:
 #Center the title of the calendar
 title = " ".join(arr1[0])
 title_mid = int(len(title)/2)
-calendar_center = 42
-title_center = 42-title_mid
+title_center = 34-title_mid
 centered_title = f'{" " * title_center}{title}'
     
 #Print the day names centered over their respective columns
@@ -69,38 +81,46 @@ day_names = {"Su":"Sunday", "Mo":"Monday", "Tu":"Tuesday", "We":"Wednesday", "Th
              "Sa":"Saturday"}
 weekday_names_string = ""
 for x in arr1[1]:
-    name_length = len(day_names[x])
-    name_spaces = 12 - name_length
-    front_spaces = math.ceil(name_spaces/2)
-    tail_spaces = math.floor(name_spaces/2)
-    weekday_names_string += f'{"." * front_spaces}{day_names[x]}{"." * tail_spaces}.'
+    name_spaces = 10 - len(day_names[x])
+    if name_spaces % 2 == 0:
+        front_spaces = int(name_spaces/2)
+        tail_spaces = front_spaces
+    else:
+        front_spaces = math.floor(name_spaces/2)
+        tail_spaces = math.ceil(name_spaces/2)
+    #print(f'{x} - front: {front_spaces}, tail: {tail_spaces}')
+    #print(weekday_names_string)
+    weekday_names_string += f'.{"." * front_spaces}{day_names[x]}{"." * tail_spaces}'
+weekday_names_string += "."
 
 #Create the lines for vertical whitespace in the calendar
 calendar_blankspace = ""
 x = 0
 while x <= 84:
     char = " "
-    if x % 12 == 0:
+    if x % 11 == 0:
         char = "|"
     calendar_blankspace += char
     x += 1
 
 #Start the formatted printing of the various lines
-print(centered_title)
-print(weekday_names_string)
-
-date_string = ""
-for x in arr1[2:]:
-    print(cal_top)
-    for y in x:
-        date_string += f'|{y}{" "* (11 - len(y))}'
-    date_string += "|"
-    print(date_string)
-    print(calendar_blankspace, calendar_blankspace, calendar_blankspace, sep="\n")
+with open(f'{my_month}_{my_year}_calendar.txt', "w+") as f:
+    f.write(centered_title + "\n")
+    f.write(weekday_names_string + "\n")
 
     date_string = ""
+    for x in arr1[2:]:
+        f.write(cal_top + "\n")
+        for y in x:
+            date_string += f'|{y}{" "* (10 - len(str(y)))}'
+        date_string += "|"
+        f.write(date_string + "\n")
+        f.write(calendar_blankspace + "\n" + calendar_blankspace + "\n" + calendar_blankspace + "\n")
 
-print(cal_top)
+        date_string = ""
+
+    f.write(cal_top)
+
 
 
 #NOTES:
